@@ -13,8 +13,7 @@ ITS2_fa = []
 stat_tb = []
 
 for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
-	taxString = record.//////
-	speciesID = record.//////
+	taxString = source.organism
 
 	#gather coordinate information
 	if feature.type == "RNA" and not "mRNA":
@@ -39,15 +38,17 @@ for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
 				else:
 					26S_start = feature.location.end
 
-			ITS1_fa.append
+		ITS1_fa.append = /////
+		ITS2_fa.append = /////
+		5S_fa.append = /////
 
 		ITS1_len = 5S_start-18S_end
 		ITS2_len = 26S_start-5S_end
 		5S_len = 5S_start-5S_end
 
-#population statistics table
-stat_tb.append([speciesID, taxString, 18S_end, 5S_start, 5S_end, 26S_start, ITS1_len, ITS2_len, 5S_len])
+#populate statistics table
+stat_tb.append([taxString, 18S_end, 5S_start, 5S_end, 26S_start, ITS1_len, ITS2_len, 5S_len])
 df = DataFrame(stat_tb)
-df.columns = ["speciesID", "taxString", "18S_end", "5S_start", "5S_end", "26S_start", "ITS1_len", "ITS2_len", "5S_len"]
+df.columns = ["taxString", "18S_end", "5S_start", "5S_end", "26S_start", "ITS1_len", "ITS2_len", "5S_len"]
 
 
