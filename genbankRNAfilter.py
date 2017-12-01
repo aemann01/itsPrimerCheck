@@ -1,54 +1,73 @@
-#!/usr/bin/env/python3
-
 import sys
+import gzip
+import pandas as pd
+import glob
+import uuid
 from pandas import DataFrame
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 
-gb_file = sys.argv[1]
+files = glob.glob(".gz")
 
-ITS1_fa = []
-ITS2_fa = []
-5S_fa = []
+es_query = ["18S rRNA", "18S ribosomal"]
+fs_query = ["5S rRNA", "5S ribosomal", "5.8S rRNA", "5.8S ribosomal"]
+ts_query = ["26S rRNA", "26S ribosomal", "28S rRNA", "28S ribosomal"]
 stat_tb = []
 
-for record in SeqIO.parse(open(gb_file, "r"), "genbank"):
-	taxString = source.organism
+for x in files:
+	for record in SeqIO.parse(gzip.open(gb_file, "r"), "genbank"):
+		for feature in record.features:
+			if feature.type == "RNA" or "CDS" and "product" in feature.qualifiers:
+				if any(x in feature.qualifiers["product"][0] for x in es_query):
+					if feature.location.end > feature.location.start:
+						Es_end = feature.location.end
+					elif feature.location.end < feature.location.start:
+						Es_end = feature.location.start
+				if any(x in feature.qualifiers["product"][0] for x in fs_query):
+					if feature.location.end > feature.location.start:
+						Fs_end = feature.location.end
+						Fs_start = feature.location.start
+					elif feature.location.end < feature.location.start:
+						Fs_end = feature.location.start
+						Fs_start = feature.location.end
+				if any(x in feature.qualifiers["product"][0] for x in ts_query):
+					if feature.location.end > feature.location.start:
+						Ts_start = feature.location.start
+					elif feature.location.end < feature.location.start:
+						Ts_start = feature.location.end
+			try:
+				Es_end
+			except NameError:
+				Es_end = "NA"
+			try:
+				Fs_end
+			except NameError:
+				Fs_end = "NA"
+			try:
+				Fs_start
+			except NameError:
+				Fs_start = "NA"
+			try:
+				Ts_end
+			except NameError:
+				Ts_end = "NA"
 
-	#gather coordinate information
-	if feature.type == "RNA" and not "mRNA":
-		if "product" in feature.qualifiers:
-			if "18S ribosomal" in feature.qualifiers['product'][0]:
-				if feature.location.end > feature.location.start:
-					18S_end = feature.location.end
-				else:
-					18S_end = feature.location.start
+#		if "taxonomy" in record.annotations:
+#			taxString = record.annotations["taxonomy"]
+#		else:
+#			taxString = gb_file
+#		if "accessions" in record.annotation:
+#			accession = record.annotations["accessions"]
+#		else:
+#			accession = "unknown"
 
-			if "5S ribosomal" or "5.8S ribosomal" in feature.qualifiers['product'][0]:
-				if feature.location.end > feature.location.start:
-					5S_end = feature.location.end
-					5S_start = feature.location.start
-				else:
-					5S_end = feature.location.start
-					5S_start = feature.location.end
+	stat_tb.append([x, Es_end, Fs_start, Fs_end, Ts_start])
+#print(stat_tb)
 
-			if "28S ribosomal" or "26S ribosomal" in feature.qualifiers['product'][0]:
-				if feature.location.start < feature.location.end:
-					26S_start = feature.location.start
-				else:
-					26S_start = feature.location.end
+	df = DataFrame(stat_tb)
+	df.columns = ["file", "18S end", "5S start", "5S end", "26S start"]
 
-		ITS1_fa.append = /////
-		ITS2_fa.append = /////
-		5S_fa.append = /////
-
-		ITS1_len = 5S_start-18S_end
-		ITS2_len = 26S_start-5S_end
-		5S_len = 5S_start-5S_end
-
-#populate statistics table
-stat_tb.append([taxString, 18S_end, 5S_start, 5S_end, 26S_start, ITS1_len, ITS2_len, 5S_len])
-df = DataFrame(stat_tb)
-df.columns = ["taxString", "18S_end", "5S_start", "5S_end", "26S_start", "ITS1_len", "ITS2_len", "5S_len"]
-
+	with open(str(uuid.uuid4(), "w") as f:
+		for line in df:
+			f.write(line)
 
