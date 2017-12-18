@@ -3,6 +3,7 @@
 '''Useage: python itsPrimerCheck.py input_R1.fastq input_R2.fastq sampleName'''
 
 import sys
+import gzip
 from Bio import SeqIO
 from itertools import zip_longest
 

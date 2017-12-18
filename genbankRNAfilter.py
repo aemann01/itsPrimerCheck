@@ -14,8 +14,8 @@ fs_query = ["5S rRNA", "5S ribosomal", "5.8S rRNA", "5.8S ribosomal"]
 ts_query = ["26S rRNA", "26S ribosomal", "28S rRNA", "28S ribosomal"]
 stat_tb = []
 
-for x in files:
-	for record in SeqIO.parse(gzip.open(gb_file, "r"), "genbank"):
+for f in files:
+	for record in SeqIO.parse(gzip.open(f, "r"), "genbank"):
 		for feature in record.features:
 			if feature.type == "RNA" or "CDS" and "product" in feature.qualifiers:
 				if any(x in feature.qualifiers["product"][0] for x in es_query):
@@ -35,39 +35,31 @@ for x in files:
 						Ts_start = feature.location.start
 					elif feature.location.end < feature.location.start:
 						Ts_start = feature.location.end
-			try:
-				Es_end
-			except NameError:
-				Es_end = "NA"
-			try:
-				Fs_end
-			except NameError:
-				Fs_end = "NA"
-			try:
-				Fs_start
-			except NameError:
-				Fs_start = "NA"
-			try:
-				Ts_end
-			except NameError:
-				Ts_end = "NA"
+				try:
+					Es_end
+				except NameError:
+					Es_end = "NA"
+				try:
+					Fs_end
+				except NameError:
+					Fs_end = "NA"
+				try:
+					Fs_start
+				except NameError:
+					Fs_start = "NA"
+				try:
+					Ts_end
+				except NameError:
+					Ts_end = "NA"
 
-#		if "taxonomy" in record.annotations:
-#			taxString = record.annotations["taxonomy"]
-#		else:
-#			taxString = gb_file
-#		if "accessions" in record.annotation:
-#			accession = record.annotations["accessions"]
-#		else:
-#			accession = "unknown"
 
-	stat_tb.append([x, Es_end, Fs_start, Fs_end, Ts_start])
-#print(stat_tb)
+	stat_tb.append([f, Es_end, Fs_start, Fs_end, Ts_start])
+	print(stat_tb)
+df = DataFrame(stat_tb)
 
-	df = DataFrame(stat_tb)
-	df.columns = ["file", "18S end", "5S start", "5S end", "26S start"]
+outfile = str(uuid.uuid4())
 
-	with open(str(uuid.uuid4(), "w") as f:
-		for line in df:
-			f.write(line)
+with open(outfile, "w") as f:
+	for line in df:
+		f.write(line)
 

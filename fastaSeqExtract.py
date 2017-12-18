@@ -11,6 +11,8 @@ rnafa = []
 for record in SeqIO.parse(sys.argv[1], "fasta"):
 	if "S ribosomal RNA " and not "mRNA" in record.description:
 		rnafa.append(record)
+	else:
+		continue
 
 with open(sys.argv[2], "w") as handle:
 	SeqIO.write(rnafa, handle, "fasta")
